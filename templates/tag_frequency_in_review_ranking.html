@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+    <title>Starter Template - Materialize</title>
+
+    <!-- CSS  -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="/static/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="/static/css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body>
+
+{% include 'header.html' %}
+<main class="container">
+    <div class="section">
+        <div class="row">
+            <form action="/tag_frequency_in_review_ranking">
+                <div class="col s12 m3 l3">
+                    <div class="input-field">
+                        <select id="brand_id" name="brand_id">
+                        </select>
+                        <label for="brand_id">品牌</label>
+                    </div>
+                </div>
+                <div class="col s12 m3 l3">
+                    <div class="input-field">
+                        <select id="product_id" name="product_id">
+                        </select>
+                        <label for="product_id">商品</label>
+                    </div>
+                </div>
+                <div class="col s12 m3 l2">
+                    <div class="input-field">
+                        <input id="review_count" name="review_count" type="text" {% if review_count %}value="{{ review_count }}" {% endif %}>
+                        <label for="review_count">最小產品心得總數量</label>
+                    </div>
+                </div>
+                <div class="col s12 m2 l2">
+                    <div class="input-field">
+                        <button class="btn waves-effect waves-light purple lighten-2" type="submit" name="action">搜尋<i class="material-icons right">search</i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="section">
+        <table class="highlight responsive-table">
+            <thead>
+            <tr>
+                <th>品牌</th>
+                <th>商品</th>
+                <th>價格</th>
+                <th>容量</th>
+                <th>標籤</th>
+                <th>標籤出現於心得數量</th>
+                <th>產品心得總數量</th>
+                <th>標籤於心得出現機率</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% if results %}
+                {% for result in results %}
+                    <tr>
+                    <td>{{ result.brand_name }}</td>
+                    <td>{{ result.product_name }}</td>
+                    <td>{{ result.price }}</td>
+                    <td>{{ result.volume }}</td>
+                    <td>{{ result.tag_name }}</td>
+                    <td>{{ result.tag_in_reviews }}</td>
+                    <td>{{ result.review_count }}</td>
+                    <td>{{ result.ratio }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
+
+    </div>
+</main>
+{% include 'footer.html' %}
+<script type="text/javascript">
+    $(function () {
+        var selected_brand_id = '{{ brand_id }}';
+        var selected_product_id = '{{ product_id }}';
+        var brands = {
+            {% for brand in brands %}
+                '{{ brand.id }}' : {
+                    name: '{{ brand.name }}',
+                    products: {
+                        {% for product in brand.products %}
+                            '{{ product.id }}' : '{{ product.name }}',
+                        {% endfor %}
+                    }
+                },
+            {% endfor %}
+        };
+        var $brandIdSelect = $('#brand_id');
+        var $productIdSelect = $('#product_id');
+        $brandIdSelect.append($('<option/>').attr('value', '-1').text('請選擇'));
+        $productIdSelect.append($('<option/>').attr('value', '-1').text('請選擇'));
+        for (var brand_id in brands) {
+            $brandIdSelect.append($('<option/>').attr('value', brand_id).text(brands[brand_id].name));
+        }
+
+        $brandIdSelect.on('change', function () {
+            updateProductSelect(brands, $productIdSelect, $(this).val())
+        });
+
+
+        $brandIdSelect.formSelect();
+        $productIdSelect.formSelect();
+        if (selected_brand_id != '') {
+            $brandIdSelect.val(selected_brand_id);
+            $brandIdSelect.formSelect('destroy').formSelect();
+            updateProductSelect(brands, $productIdSelect, selected_brand_id)
+        }
+        if (selected_product_id != '') $productIdSelect.val(selected_product_id);
+        $productIdSelect.formSelect('destroy').formSelect();
+
+        function updateProductSelect(brands, $productIdSelect, brand_id) {
+            $productIdSelect.empty();
+            $productIdSelect.append($('<option/>').attr('value', '-1').text('請選擇'));
+            if (brand_id != null) {
+                for (var product_id in brands[brand_id].products) {
+                    $productIdSelect.append($('<option/>').attr('value', product_id).text(brands[brand_id].products[product_id]));
+                }
+                $productIdSelect.formSelect('destroy').formSelect();
+            }
+        }
+    });
+</script>
+</body>
+</html>

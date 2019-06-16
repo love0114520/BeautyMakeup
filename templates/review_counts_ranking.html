@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0"/>
+    <title>Starter Template - Materialize</title>
+
+    <!-- CSS  -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="/static/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+    <link href="/static/css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+</head>
+<body>
+
+{% include 'header.html' %}
+<main class="container">
+    <div class="section">
+        <div class="row">
+            <form action="/review_counts_ranking">
+                <div class="col s12 m5 l5">
+                    <div class="input-field">
+                        <input id="start_date" name="start_date" type="text" class="datepicker" {% if start_date %}value="{{ start_date }}" {% endif %}>
+                        <label for="start_date">開始日期</label>
+                    </div>
+                </div>
+                <div class="col s12 m5 l5">
+                    <div class="input-field">
+                        <input id="end_date" name="end_date" type="text" class="datepicker" {% if end_date %}value="{{ end_date }}" {% endif %}>
+                        <label for="end_date">結束日期</label>
+                    </div>
+                </div>
+                <div class="col s12 m2 l2">
+                    <div class="input-field">
+                        <button class="btn waves-effect waves-light purple lighten-2" type="submit" name="action">搜尋<i class="material-icons right">search</i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="section">
+        <table class="highlight responsive-table">
+            <thead>
+            <tr>
+                <th>品牌</th>
+                <th>產品</th>
+                <th>價格</th>
+                <th>容量</th>
+                <th>上市日期</th>
+                <th>心得數量</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            {% if results %}
+                {% for result in results %}
+                    <tr>
+                    <td>{{ result.brand_name }}</td>
+                    <td>{{ result.product_name }}</td>
+                    <td>{{ result.price }}</td>
+                    <td>{{ result.volume }}</td>
+                    <td>{{ result.release_date }}</td>
+                    <td>{{ result.review_count }}</td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
+
+    </div>
+</main>
+{% include 'footer.html' %}
+<script type="text/javascript">
+    $(function () {
+        $('.datepicker').datepicker({format:'yyyy-mm-dd'});
+    })
+</script>
+</body>
+</html>
